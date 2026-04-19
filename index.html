@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>42W — forty-two watts</title>
+<meta name="description" content="Home energy management that actually works. Coordinates solar, batteries, grid, and EV chargers so your house runs on its own power." />
+<meta property="og:title" content="42W — forty-two watts" />
+<meta property="og:description" content="Home energy management that actually works. Open source. Runs on a Pi." />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://fortytwowatts.com" />
+<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+<link rel="preconnect" href="https://rsms.me/" />
+<link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
+<style>
+  :root {
+    --bg: #0b0d10;
+    --bg-soft: #111418;
+    --fg: #e7e9ec;
+    --fg-dim: #8b9199;
+    --line: #1d2126;
+    --accent: #ffb020;
+    --accent-soft: rgba(255, 176, 32, 0.12);
+    --radius: 10px;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: var(--bg); color: var(--fg); }
+  body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-feature-settings: 'cv11', 'ss01';
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+  }
+  .wrap { width: 100%; max-width: 880px; margin: 0 auto; padding: 0 24px; }
+  header {
+    padding: 28px 0 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .brand { display: flex; align-items: center; gap: 12px; font-weight: 600; letter-spacing: -0.01em; }
+  .brand-mark {
+    width: 28px; height: 28px; border-radius: 7px;
+    background: var(--accent); color: #000;
+    display: grid; place-items: center;
+    font-weight: 700; font-size: 12px; letter-spacing: -0.02em;
+  }
+  .nav { display: flex; gap: 20px; font-size: 14px; }
+  .nav a { color: var(--fg-dim); text-decoration: none; }
+  .nav a:hover { color: var(--fg); }
+
+  main { flex: 1; padding: 72px 0 48px; }
+
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 12px; font-weight: 500;
+    color: var(--accent);
+    background: var(--accent-soft);
+    padding: 6px 10px; border-radius: 999px;
+    margin-bottom: 24px;
+  }
+  .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 8px var(--accent); }
+
+  h1 {
+    font-size: clamp(40px, 7vw, 72px);
+    line-height: 1.04;
+    letter-spacing: -0.03em;
+    margin: 0 0 20px;
+    font-weight: 700;
+  }
+  h1 .accent { color: var(--accent); }
+
+  .lede {
+    font-size: clamp(17px, 2vw, 20px);
+    color: var(--fg-dim);
+    max-width: 620px;
+    margin: 0 0 36px;
+  }
+
+  .cta { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 64px; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 11px 18px; border-radius: 8px;
+    font-size: 14px; font-weight: 500;
+    text-decoration: none;
+    transition: transform .15s ease, background .15s ease;
+  }
+  .btn-primary { background: var(--accent); color: #000; }
+  .btn-primary:hover { transform: translateY(-1px); }
+  .btn-ghost { background: transparent; color: var(--fg); border: 1px solid var(--line); }
+  .btn-ghost:hover { border-color: var(--fg-dim); }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+  .cell { background: var(--bg); padding: 22px; }
+  .cell h3 { margin: 0 0 6px; font-size: 15px; font-weight: 600; letter-spacing: -0.01em; }
+  .cell p { margin: 0; color: var(--fg-dim); font-size: 14px; line-height: 1.5; }
+  .cell .k { color: var(--accent); font-variant-numeric: tabular-nums; font-weight: 600; }
+
+  .meta {
+    margin-top: 56px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    font-size: 13px;
+    color: var(--fg-dim);
+  }
+  .meta strong { color: var(--fg); font-weight: 500; }
+  code { font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 12.5px; color: var(--fg); background: var(--bg-soft); padding: 2px 6px; border-radius: 4px; }
+
+  footer {
+    border-top: 1px solid var(--line);
+    padding: 24px 0;
+    font-size: 13px;
+    color: var(--fg-dim);
+    display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px;
+  }
+  footer a { color: var(--fg-dim); text-decoration: none; }
+  footer a:hover { color: var(--fg); }
+
+  @media (max-width: 540px) {
+    .meta { grid-template-columns: 1fr; }
+    main { padding: 48px 0 32px; }
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand">
+        <div class="brand-mark">42</div>
+        <span>forty-two watts</span>
+      </div>
+      <nav class="nav">
+        <a href="https://github.com/frahlg/forty-two-watts">GitHub</a>
+        <a href="https://discord.gg/z7FxpQnk">Discord</a>
+      </nav>
+    </header>
+
+    <main>
+      <div class="wrap" style="padding:0">
+        <span class="eyebrow"><span class="dot"></span> v0.4.0-alpha · running in production</span>
+        <h1>Home energy that <span class="accent">actually works.</span></h1>
+        <p class="lede">
+          42W coordinates your solar, batteries, grid, and EV charger in real time — so your house runs on its own power.
+          One Go binary. Runs on a Raspberry Pi. No cloud required.
+        </p>
+
+        <div class="cta">
+          <a class="btn btn-primary" href="https://github.com/frahlg/forty-two-watts">View on GitHub →</a>
+          <a class="btn btn-ghost" href="https://discord.gg/z7FxpQnk">Join the Discord</a>
+        </div>
+
+        <section class="grid" aria-label="features">
+          <div class="cell">
+            <h3>Local-first</h3>
+            <p>Control loop runs on-device. Grid frequency balances every second — cloud APIs can't keep up.</p>
+          </div>
+          <div class="cell">
+            <h3>MPC planner</h3>
+            <p>48-hour horizon. Electricity prices + weather forecasts decide when to charge, discharge, or hold.</p>
+          </div>
+          <div class="cell">
+            <h3>Digital twins</h3>
+            <p>Online models learn your roof, your load pattern, and fill in missing price data.</p>
+          </div>
+          <div class="cell">
+            <h3><span class="k">19</span> drivers</h3>
+            <p>Sungrow, Ferroamp, Huawei, Deye, Solis, SMA, Fronius, Kostal, Pixii, Easee and more.</p>
+          </div>
+          <div class="cell">
+            <h3>EV-aware dispatch</h3>
+            <p>Batteries stop discharging when your car is charging. No energy round-trips.</p>
+          </div>
+          <div class="cell">
+            <h3>Home Assistant</h3>
+            <p>Built-in MQTT autodiscovery. Sensors and controls appear automatically.</p>
+          </div>
+        </section>
+
+        <div class="meta">
+          <div>
+            <strong>Get it running</strong><br />
+            <code>git clone github.com/frahlg/forty-two-watts</code><br />
+            <code>make dev</code> — with simulators.
+          </div>
+          <div>
+            <strong>Status</strong><br />
+            Alpha. API and config may change. Real hardware in production today. Join Discord for updates.
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer>
+      <div>forty-two watts · MIT licensed</div>
+      <div><a href="https://github.com/frahlg/forty-two-watts">github.com/frahlg/forty-two-watts</a></div>
+    </footer>
+  </div>
+</body>
+</html>
