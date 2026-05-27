@@ -272,8 +272,10 @@
       </div>
       <nav class="nav">
         <a href="#features">Features</a>
+        <a href="#modes">Modes</a>
         <a href="#philosophy">Why</a>
         <a href="#specs">Specs</a>
+        <a href="#install">Install</a>
         <a href="https://github.com/frahlg/forty-two-watts">GitHub</a>
       </nav>
     </header>
@@ -283,7 +285,7 @@
       <!-- ============ HERO ============ -->
       <section>
         <div class="panic">Don't Panic</div>
-        <span class="eyebrow"><span class="dot live"></span> v0.4.0-alpha · running in production · mostly harmless</span>
+        <span class="eyebrow"><span class="dot live"></span> v0.8.0 · running in homes · mostly harmless</span>
         <h1>The answer is <span class="accent">forty-two watts.</span></h1>
         <p class="lede">
           42W is a single Go binary that runs on a Raspberry Pi and coordinates your solar, batteries, grid, and EV charger in real time —
@@ -292,8 +294,9 @@
           <span style="color:var(--accent)">~0.6&nbsp;ms</span>.
         </p>
         <div class="cta">
-          <a class="btn btn-primary" href="https://github.com/frahlg/forty-two-watts">Read the source →</a>
-          <a class="btn btn-ghost" href="https://discord.gg/z7FxpQnk">Join the Discord</a>
+          <a class="btn btn-primary" href="#install">Get it running →</a>
+          <a class="btn btn-ghost" href="https://github.com/frahlg/forty-two-watts">Read the source</a>
+          <a class="btn btn-ghost" href="https://discord.gg/z7FxpQnk">Discord</a>
         </div>
       </section>
 
@@ -312,6 +315,11 @@
             So we wrote 42W. A single binary you can <code>scp</code> to a Raspberry Pi. Drivers in plain Lua
             so anyone who can read a register map can add an inverter in an afternoon. Physics at the edge,
             priceshaving at the planner, and the cloud is a nice-to-have — not a dependency.
+          </p>
+          <p>
+            It works. Real homes are running it through real winters. <strong>28 Lua drivers</strong> now,
+            three planner modes, a setup wizard, a Home Assistant add-on, push notifications, and a remote-access
+            bridge so we can help debug your install without a VPN.
           </p>
           <p>
             We <em>know</em> this stuff at <a href="https://sourceful.energy" style="color:var(--accent);text-decoration:none">Sourceful</a>.
@@ -344,8 +352,8 @@
             <p>Three online models: a PV twin (RLS, learns your roof), a load twin (168 hour-of-week buckets + heating coefficient), and a price twin (fills the day-ahead gap). No training phase — they learn while they work.</p>
           </div>
           <div class="cell">
-            <h3>Lua drivers <span class="k">20 shipped</span></h3>
-            <p>Sungrow, Ferroamp, Huawei, Deye, Solis, SMA, Fronius, Kostal, GoodWe, Growatt, Sofar, SolarEdge, Victron, Pixii, Easee, Eastron SDM630. One <code>.lua</code> file per device. Hot-reloadable. No compile step.</p>
+            <h3>Lua drivers <span class="k">28 shipped</span></h3>
+            <p>Sungrow, Ferroamp (MQTT+Modbus), Huawei, Deye, Solis, SMA, Fronius, Kostal, GoodWe, Growatt, Sofar, SolarEdge (3 variants), Victron, Pixii, Sonnen, CTEK, Tesla Vehicle, Easee, SDM630, Sourceful Zap. One <code>.lua</code> per device. Hot-reloadable.</p>
           </div>
           <div class="cell">
             <h3>Watchdog</h3>
@@ -357,15 +365,54 @@
           </div>
           <div class="cell">
             <h3>Home Assistant</h3>
-            <p>MQTT autodiscovery. Point it at your Mosquitto, sensors and controls appear in HA automatically. Also optional federation to Sourceful Nova Core (ES256 identity, JWT MQTT auth).</p>
+            <p>MQTT autodiscovery. Point it at your Mosquitto, sensors and controls appear in HA automatically. Also ships as a Home Assistant OS add-on if you'd rather not run a separate Pi.</p>
           </div>
           <div class="cell">
             <h3>Long-term history</h3>
             <p>SQLite hot store keeps 14 days at 5 s resolution. Daily rolloff to zstd-compressed Parquet, dictionary-encoded per metric. A full year fits in a few GB. Query your house.</p>
           </div>
           <div class="cell">
+            <h3>Remote access <span class="k">SubEtha</span></h3>
+            <p>Time-bound remote access over <em>SubEtha</em> — our own private relay at <code>subetha.fortytwowatts.com</code>, hop-by-hop, no vendor cloud, no port forwarding. Start a session from the web UI; an MCP bridge lets Claude help debug your install on the other side.</p>
+          </div>
+          <div class="cell">
+            <h3>Push notifications <span class="k">ntfy</span></h3>
+            <p>Subscribe to a topic on your phone, pick events to track (driver offline / recovery), set per-event thresholds and cooldowns. Provider registry; adding Pushover or Slack is one Go file.</p>
+          </div>
+          <div class="cell">
+            <h3>Mobile app <span class="k">soon</span></h3>
+            <p>The <a href="https://sourceful.energy" style="color:var(--accent);text-decoration:none">Sourceful Energy</a> mobile app is getting 42W support — pair your Pi over SubEtha, watch live flows, flip planner modes, get push alerts. iOS and Android. Coming soon.</p>
+          </div>
+          <div class="cell">
             <h3>Self-tuning batteries</h3>
             <p>The <code>selftune</code> package injects known step commands, observes the response, and fits ARX(1) parameters. Bootstraps the cascade controller from first principles. No calibration wizard required.</p>
+          </div>
+          <div class="cell">
+            <h3>Scenarios test matrix <span class="k">forecast × telemetry × mode</span></h3>
+            <p>Combinatorial replay of MPC inputs against control-loop outputs. Catches the bugs that only appear when the cloud is wrong, the meter is noisy, <em>and</em> the user picked the weird mode.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ MODES ============ -->
+      <section id="modes">
+        <p class="section-label">// planner modes</p>
+        <h2>Three modes. One brain.</h2>
+        <p class="section-intro">
+          Same MPC, same DP, same clamps. What changes is the objective. Pick a mode in the UI; the planner re-solves at the next 15-minute boundary.
+        </p>
+        <div class="philo">
+          <div class="card">
+            <h3><span class="num">SELF</span>Self-consumption</h3>
+            <p>Never import to charge. Never export from battery. Just cover your own load. The safe default — what the inverter does on its own, only smoother and meter-aware.</p>
+          </div>
+          <div class="card">
+            <h3><span class="num">PASSIVE</span>Passive arbitrage</h3>
+            <p>Charges <em>only</em> from your own surplus PV, then discharges when prices peak. Merges the old <code>planner_self</code> and <code>planner_cheap</code> intents — your roof pays back faster, the meter never spins backwards on purpose.</p>
+          </div>
+          <div class="card">
+            <h3><span class="num">ACTIVE</span>Active arbitrage</h3>
+            <p>Full price optimisation: import when cheap, export when profitable, within fuse and SoC limits. The MPC values terminal SoC at the import–export spread and blends forecasts by confidence so a single bad prediction can't lock in a bad trade.</p>
           </div>
         </div>
       </section>
@@ -457,7 +504,8 @@
           <div class="spec-row"><span class="k">mpc.horizon</span><span class="v"><span class="accent">48</span> hours</span></div>
           <div class="spec-row"><span class="k">mpc.state_space</span><span class="v">51 · 21 · 193 ≈ <span class="accent">207k</span></span></div>
           <div class="spec-row"><span class="k">mpc.solve_time</span><span class="v">~<span class="accent">0.6</span> ms</span></div>
-          <div class="spec-row"><span class="k">drivers.shipped</span><span class="v"><span class="accent">20</span> lua files</span></div>
+          <div class="spec-row"><span class="k">drivers.shipped</span><span class="v"><span class="accent">28</span> lua files</span></div>
+          <div class="spec-row"><span class="k">planner.modes</span><span class="v">self · passive · active</span></div>
           <div class="spec-row"><span class="k">pi.integral_limit</span><span class="v">3000 W</span></div>
           <div class="spec-row"><span class="k">dispatch.slew_rate</span><span class="v">500 W / interval</span></div>
           <div class="spec-row"><span class="k">soc.default_floor</span><span class="v">10%</span></div>
@@ -467,8 +515,11 @@
           <div class="spec-row"><span class="k">twin.load</span><span class="v">168 hour-of-week buckets · α=0.1</span></div>
           <div class="spec-row"><span class="k">history.hot</span><span class="v">14 days @ 5 s (SQLite)</span></div>
           <div class="spec-row"><span class="k">history.cold</span><span class="v">Parquet · zstd · dictionary encoded</span></div>
-          <div class="spec-row"><span class="k">codebase.go</span><span class="v">~<span class="accent">30,700</span> lines</span></div>
-          <div class="spec-row"><span class="k">codebase.tests</span><span class="v">~22,500 lines · 56 files</span></div>
+          <div class="spec-row"><span class="k">codebase.go</span><span class="v">~<span class="accent">38,900</span> lines</span></div>
+          <div class="spec-row"><span class="k">codebase.tests</span><span class="v">~29,700 lines · 119 files</span></div>
+          <div class="spec-row"><span class="k">snapshot.size</span><span class="v">~50 MB · ~2 s restore</span></div>
+          <div class="spec-row"><span class="k">remote.access</span><span class="v">ftw-pair · <span class="accent">SubEtha</span> relay</span></div>
+          <div class="spec-row"><span class="k">notifications</span><span class="v">ntfy · template events</span></div>
           <div class="spec-row"><span class="k">license</span><span class="v">MIT</span></div>
         </div>
       </section>
@@ -498,7 +549,7 @@
               <span class="author-name">Erik Arenhill</span>
               <span class="author-tag">@erikarenhill</span>
             </div>
-            <p class="author-role">Co-developer. Joined days after creation and has been shipping with Fredrik ever since. Makes the web front-end not look like 1998.</p>
+            <p class="author-role">Co-developer. Joined days after creation and has been shipping with Fredrik ever since. Maintains the Home Assistant add-on. Makes the web front-end not look like 1998.</p>
             <div class="author-links">
               <a href="https://github.com/erikarenhill">GitHub</a>
             </div>
@@ -506,19 +557,43 @@
         </div>
       </section>
 
-      <!-- ============ CTA ============ -->
-      <section>
+      <!-- ============ INSTALL ============ -->
+      <section id="install">
         <p class="section-label">// get started</p>
-        <h2>Three commands. One binary.</h2>
-        <div class="arch">
-<pre><span class="d">$</span> git clone https://github.com/frahlg/forty-two-watts
-<span class="d">$</span> cd forty-two-watts
-<span class="d">$</span> make dev       <span class="d"># starts sim-ferroamp + sim-sungrow + the app</span>
+        <h2>Four ways in.</h2>
+        <p class="section-intro">
+          Pick the shortest path to your house. All four end up at the same web UI on port 8080 with the same setup wizard.
+        </p>
+
+        <div class="grid">
+          <div class="cell">
+            <h3>SD card image <span class="k">easiest</span></h3>
+            <p>Flash <code>42w-rpi4-arm64.img.xz</code> to a card with Raspberry Pi Imager or balenaEtcher, boot, open <code>http://42w.local/</code>. A <code>42w-setup</code> captive portal handles WiFi if you didn't pre-configure it.</p>
+          </div>
+          <div class="cell">
+            <h3>One-shot Docker <span class="k">curl | bash</span></h3>
+            <p>Existing Pi, Debian, or Ubuntu box. The installer pulls the multi-arch image from GHCR and starts the container. Idempotent — re-run to upgrade.</p>
+          </div>
+          <div class="cell">
+            <h3>Home Assistant add-on <span class="k">HA OS</span></h3>
+            <p>Already running Home Assistant OS or Supervised? Install 42W as a supervisor add-on. Maintained by Erik at <code>erikarenhill/ha-addon-forty-two-watts</code>.</p>
+          </div>
+          <div class="cell">
+            <h3>From source <span class="k">Go 1.25+</span></h3>
+            <p>Clone, <code>make dev</code> for sim, <code>make build-arm64</code> + <code>scp</code> for a Pi. For people who want to add a driver or hack the planner.</p>
+          </div>
+        </div>
+
+        <div class="arch" style="margin-top:24px">
+<pre><span class="d"># Pi or Linux box, one shot</span>
+<span class="d">$</span> curl -fsSL https://raw.githubusercontent.com/frahlg/forty-two-watts/master/scripts/install.sh | bash
+<span class="d">$</span> open http://&lt;your-pi&gt;:8080/setup
+
+<span class="d"># Source build with simulators</span>
+<span class="d">$</span> git clone https://github.com/frahlg/forty-two-watts && cd forty-two-watts
+<span class="d">$</span> make dev          <span class="d"># sim-ferroamp + sim-sungrow + the app</span>
 <span class="d">$</span> open http://localhost:8080</pre>
         </div>
-        <p class="section-intro" style="margin-top:24px">
-          When you're ready for hardware: <code>make build-arm64</code>, <code>scp</code> to your Pi, edit the config, <code>systemctl start</code>. That's the whole deployment story.
-        </p>
       </section>
 
     </main>
