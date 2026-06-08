@@ -628,31 +628,27 @@
         </div>
       </section>
 
-      <!-- ============ SPECS ============ -->
-      <section id="specs">
-        <p class="section-label">// data sheet</p>
-        <h2>Numbers, because physics.</h2>
-        <div class="specs">
-          <div class="spec-row"><span class="k">control_loop.period</span><span class="v"><span class="accent">5</span> seconds</span></div>
-          <div class="spec-row"><span class="k">mpc.cadence</span><span class="v"><span class="accent">15</span> minutes</span></div>
-          <div class="spec-row"><span class="k">mpc.horizon</span><span class="v"><span class="accent">48</span> hours</span></div>
-          <div class="spec-row"><span class="k">mpc.state_space</span><span class="v">51 · 21 · 193 ≈ <span class="accent">207k</span></span></div>
-          <div class="spec-row"><span class="k">mpc.solve_time</span><span class="v">~<span class="accent">0.6</span> ms</span></div>
-          <div class="spec-row"><span class="k">drivers.coverage</span><span class="v">vast majority · growing</span></div>
-          <div class="spec-row"><span class="k">planner.modes</span><span class="v">self · passive · active</span></div>
-          <div class="spec-row"><span class="k">pi.integral_limit</span><span class="v">3000 W</span></div>
-          <div class="spec-row"><span class="k">dispatch.slew_rate</span><span class="v">500 W / interval</span></div>
-          <div class="spec-row"><span class="k">soc.default_floor</span><span class="v">10%</span></div>
-          <div class="spec-row"><span class="k">soc.default_ceiling</span><span class="v">95%</span></div>
-          <div class="spec-row"><span class="k">watchdog.timeout</span><span class="v">60 seconds</span></div>
-          <div class="spec-row"><span class="k">twin.pv</span><span class="v">RLS · 7 features · λ=0.995</span></div>
-          <div class="spec-row"><span class="k">twin.load</span><span class="v">168 hour-of-week buckets · α=0.1</span></div>
-          <div class="spec-row"><span class="k">history.hot</span><span class="v">14 days @ 5 s (SQLite)</span></div>
-          <div class="spec-row"><span class="k">history.cold</span><span class="v">Parquet · zstd · dictionary encoded</span></div>
-          <div class="spec-row"><span class="k">snapshot.size</span><span class="v">~50 MB · ~2 s restore</span></div>
-          <div class="spec-row"><span class="k">remote.access</span><span class="v">passkeys · <span class="accent">p2p</span></span></div>
-          <div class="spec-row"><span class="k">notifications</span><span class="v">ntfy · template events</span></div>
-          <div class="spec-row"><span class="k">license</span><span class="v">MIT</span></div>
+      <!-- ============ WHY IT WORKS ============ -->
+      <section id="real">
+        <p class="section-label">// why it's different</p>
+        <h2>It handles real homes — and bends when you want it to.</h2>
+        <p class="section-intro">
+          Plenty of projects can blink an LED when the sun comes out. The hard part is running a whole house —
+          reliably, for years, on whatever mix of hardware you already own. That's the part 42W is actually good at.
+        </p>
+        <div class="philo">
+          <div class="card">
+            <h3><span class="num">01</span>Real systems, for real</h3>
+            <p>Not a lab demo with one battery. 42W runs whole homes — several inverters, batteries, meters and chargers from different brands at once — making a safe, sensible decision every few seconds, right through the depths of winter.</p>
+          </div>
+          <div class="card">
+            <h3><span class="num">02</span>Most of it just works</h3>
+            <p>Pick your hardware, run the setup wizard, and it starts coordinating your house. The defaults are the ones we'd run in our own homes — safe battery limits, sane fallbacks, a planner that just optimises. You get value on day one without touching a single setting.</p>
+          </div>
+          <div class="card">
+            <h3><span class="num">03</span>Yours to customise</h3>
+            <p>When you do want to tinker, everything is open and in plain text. Drivers are small Lua files anyone can read or extend, the planner modes are one click in the UI, and every limit is a setting you control — not a locked vendor decision. Easy to bend, hard to break.</p>
+          </div>
         </div>
       </section>
 
