@@ -3,15 +3,54 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>42W — The Answer is Forty-Two Watts</title>
-<meta name="description" content="Home energy management that actually works. A single Go binary that coordinates solar, batteries, grid, and EV chargers locally. Don't panic." />
-<meta property="og:title" content="42W — The Answer is Forty-Two Watts" />
-<meta property="og:description" content="A single Go binary that runs your house on its own power. Open source. Mostly harmless." />
+<title>forty-two watts — open-source local home energy management for solar, batteries &amp; EV</title>
+<meta name="description" content="forty-two watts (42W) is an open-source, local-first home energy management system. A single Go binary on a Raspberry Pi coordinates your solar, battery, grid and EV charger in real time with a real model-predictive optimiser — no cloud required. MIT licensed." />
+<meta name="keywords" content="home energy management, HEMS, solar battery optimiser, EV charging, V2X, self-hosted, local-first, Raspberry Pi, MPC, model predictive control, energy arbitrage, open source, Home Assistant, Modbus, MQTT, off-grid" />
+<meta name="robots" content="index,follow" />
+<meta name="author" content="Fredrik Ahlgren, Erik Arenhill" />
+<meta name="theme-color" content="#0b0d10" />
+<link rel="canonical" href="https://fortytwowatts.com/" />
+
+<!-- Open Graph -->
+<meta property="og:title" content="forty-two watts — the open-source brain for your solar, battery &amp; EV" />
+<meta property="og:description" content="A single Go binary on a Raspberry Pi runs your home on its own power — real-time, local, no cloud. State of the art in open home energy. MIT licensed." />
 <meta property="og:type" content="website" />
-<meta property="og:url" content="https://fortytwowatts.com" />
+<meta property="og:url" content="https://fortytwowatts.com/" />
+<meta property="og:image" content="https://fortytwowatts.com/logo.jpg" />
+<meta property="og:site_name" content="forty-two watts" />
+
+<!-- Twitter -->
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="forty-two watts — open-source local home energy management" />
+<meta name="twitter:description" content="One Go binary on a Pi coordinates solar, battery, grid and EV in real time. Local-first, no cloud, real MPC. MIT licensed." />
+<meta name="twitter:image" content="https://fortytwowatts.com/logo.jpg" />
+<meta name="twitter:site" content="@frahlg" />
+
 <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
 <link rel="preconnect" href="https://rsms.me/" />
 <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "forty-two watts",
+  "alternateName": "42W",
+  "applicationCategory": "DeveloperApplication",
+  "applicationSubCategory": "Home energy management system",
+  "operatingSystem": "Linux, Raspberry Pi OS",
+  "url": "https://fortytwowatts.com/",
+  "downloadUrl": "https://github.com/frahlg/forty-two-watts",
+  "softwareHelp": "https://github.com/frahlg/forty-two-watts",
+  "license": "https://opensource.org/licenses/MIT",
+  "description": "Open-source, local-first home energy management. A single Go binary on a Raspberry Pi coordinates solar, battery, grid and EV charging in real time with a real 48-hour model-predictive optimiser. No cloud required.",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "author": [
+    { "@type": "Person", "name": "Fredrik Ahlgren", "url": "https://github.com/frahlg" },
+    { "@type": "Person", "name": "Erik Arenhill", "url": "https://github.com/erikarenhill" }
+  ]
+}
+</script>
 <style>
   :root {
     --bg: #0b0d10;
@@ -24,10 +63,12 @@
     --accent: #ffb020;
     --accent-soft: rgba(255, 176, 32, 0.10);
     --green: #7ac142;
+    --discord: #5865f2;
     --radius: 10px;
   }
   * { box-sizing: border-box; }
   html, body { margin: 0; padding: 0; background: var(--bg); color: var(--fg); }
+  html { scroll-behavior: smooth; }
   body {
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
     font-feature-settings: 'cv11', 'ss01';
@@ -45,6 +86,8 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
   }
   .brand { display: flex; align-items: center; gap: 12px; font-weight: 600; letter-spacing: -0.01em; }
   .brand-mark {
@@ -53,9 +96,10 @@
     display: grid; place-items: center;
     font-weight: 700; font-size: 12px; letter-spacing: -0.02em;
   }
-  .nav { display: flex; gap: 22px; font-size: 14px; }
+  .nav { display: flex; gap: 22px; font-size: 14px; flex-wrap: wrap; }
   .nav a { color: var(--fg-dim); text-decoration: none; }
   .nav a:hover { color: var(--fg); }
+  .nav a.dc { color: var(--accent); font-weight: 500; }
 
   main { flex: 1; padding: 60px 0 48px; }
 
@@ -75,8 +119,8 @@
   @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
 
   h1 {
-    font-size: clamp(44px, 7.5vw, 80px);
-    line-height: 1.02;
+    font-size: clamp(40px, 7vw, 74px);
+    line-height: 1.04;
     letter-spacing: -0.035em;
     margin: 0 0 18px;
     font-weight: 700;
@@ -99,7 +143,7 @@
   .lede {
     font-size: clamp(17px, 1.8vw, 19px);
     color: var(--fg-dim);
-    max-width: 640px;
+    max-width: 660px;
     margin: 0 0 32px;
   }
   .lede strong { color: var(--fg); font-weight: 500; }
@@ -116,6 +160,9 @@
   .btn-primary:hover { transform: translateY(-1px); }
   .btn-ghost { background: transparent; color: var(--fg); border: 1px solid var(--line); }
   .btn-ghost:hover { border-color: var(--fg-dim); }
+  .btn-discord { background: var(--discord); color: #fff; }
+  .btn-discord:hover { background: #4752d4; transform: translateY(-1px); }
+  .btn-lg { padding: 14px 24px; font-size: 15px; }
 
   /* ---------- sections ---------- */
   section { margin-bottom: 72px; }
@@ -137,10 +184,51 @@
   }
   .section-intro {
     color: var(--fg-dim);
-    max-width: 640px;
+    max-width: 660px;
     margin: 0 0 32px;
     font-size: 16px;
   }
+  .section-intro strong { color: var(--fg); font-weight: 500; }
+
+  /* ---------- contrast (problem / 42W) ---------- */
+  .contrast {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+  .contrast-col {
+    background: var(--bg-card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 22px 24px;
+  }
+  .contrast-col.good { border-color: rgba(122, 193, 66, 0.32); }
+  .ct-label {
+    font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    margin: 0 0 14px;
+    font-weight: 600;
+  }
+  .contrast-col.bad .ct-label { color: var(--fg-dimmer); }
+  .contrast-col.good .ct-label { color: var(--green); }
+  .contrast-col ul { margin: 0; padding-left: 18px; }
+  .contrast-col li { font-size: 14px; line-height: 1.5; margin-bottom: 9px; color: var(--fg-dim); }
+  .contrast-col li:last-child { margin-bottom: 0; }
+  .contrast-col.good li { color: var(--fg); }
+
+  .leadership {
+    color: var(--fg-dim);
+    font-size: 15.5px;
+    line-height: 1.65;
+    max-width: 720px;
+    margin: 0;
+    border-left: 2px solid var(--accent);
+    padding-left: 18px;
+  }
+  .leadership strong { color: var(--fg); font-weight: 500; }
 
   /* ---------- feature grid ---------- */
   .grid {
@@ -225,6 +313,26 @@
   .story p:last-child { margin: 0; }
   .story em { color: var(--fg-dim); font-style: normal; }
 
+  /* ---------- community / discord ---------- */
+  .community-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    flex-wrap: wrap;
+    background: linear-gradient(120deg, rgba(88,101,242,0.10), rgba(88,101,242,0.02) 60%);
+    border: 1px solid var(--line);
+    border-left: 2px solid var(--discord);
+    border-radius: var(--radius);
+    padding: 26px 28px;
+    margin-bottom: 16px;
+  }
+  .community-text h3 { margin: 0 0 6px; font-size: 17px; font-weight: 600; letter-spacing: -0.01em; }
+  .community-text p { margin: 0; color: var(--fg-dim); font-size: 14px; max-width: 460px; line-height: 1.55; }
+  .community-fine { margin: 0; color: var(--fg-dim); font-size: 14px; }
+  .community-fine a { color: var(--accent); text-decoration: none; }
+  .community-fine a:hover { text-decoration: underline; }
+
   /* ---------- authors ---------- */
   .authors { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
   .author {
@@ -251,14 +359,20 @@
   }
   footer a { color: var(--fg-dim); text-decoration: none; }
   footer a:hover { color: var(--fg); }
+  footer .links { display: flex; gap: 18px; }
+  footer .links a.dc { color: var(--accent); }
   .fine { color: var(--fg-dimmer); font-size: 12px; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; }
 
   code { font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 12.5px; color: var(--fg); background: var(--bg-soft); padding: 2px 6px; border-radius: 4px; }
 
+  @media (max-width: 640px) {
+    .contrast { grid-template-columns: 1fr; }
+  }
   @media (max-width: 540px) {
     main { padding: 40px 0 32px; }
     section { margin-bottom: 56px; }
     .spec-row { padding: 10px 16px; font-size: 12px; }
+    .community-card { padding: 22px; }
   }
 </style>
 </head>
@@ -271,11 +385,12 @@
         <span>forty-two watts</span>
       </div>
       <nav class="nav">
+        <a href="#what">What</a>
         <a href="#features">Features</a>
         <a href="#modes">Modes</a>
         <a href="#philosophy">Why</a>
-        <a href="#specs">Specs</a>
         <a href="#install">Install</a>
+        <a class="dc" href="#community">Discord</a>
         <a href="https://github.com/frahlg/forty-two-watts">GitHub</a>
       </nav>
     </header>
@@ -285,48 +400,63 @@
       <!-- ============ HERO ============ -->
       <section>
         <div class="panic">Don't Panic</div>
-        <span class="eyebrow"><span class="dot live"></span> v0.8.0 · running in homes · mostly harmless</span>
-        <h1>The answer is <span class="accent">forty-two watts.</span></h1>
+        <span class="eyebrow"><span class="dot live"></span> open source · running in real homes · MIT</span>
+        <h1>The open-source brain for your <span class="accent">solar, battery &amp; EV.</span></h1>
         <p class="lede">
-          42W is a single Go binary that runs on a Raspberry Pi and coordinates your solar, batteries, grid, and EV charger in real time —
-          so your house runs on its own power. <strong>Local-first. No cloud required.</strong>
-          Deep Thought took 7½ million years to compute the Answer. Our MPC solves 200,000 states in
+          <strong>forty-two watts</strong> is a single Go binary on a Raspberry Pi that coordinates your solar,
+          battery, grid and EV charger in real time — so your house runs on its own power and the cheapest
+          electrons available. <strong>Local-first. No cloud required. MIT licensed.</strong>
+          Deep Thought took 7½ million years to compute the Answer; our MPC plans 48 hours of your home in
           <span style="color:var(--accent)">~0.6&nbsp;ms</span>.
         </p>
         <div class="cta">
           <a class="btn btn-primary" href="#install">Get it running →</a>
           <a class="btn btn-ghost" href="https://github.com/frahlg/forty-two-watts">Read the source</a>
-          <a class="btn btn-ghost" href="https://discord.gg/z7FxpQnk">Discord</a>
+          <a class="btn btn-discord" href="https://discord.gg/z7FxpQnk">Join the Discord</a>
         </div>
       </section>
 
-      <!-- ============ STORY ============ -->
-      <section>
-        <p class="section-label">// origin</p>
-        <h2>Born from frustration.</h2>
-        <div class="story">
-          <p>
-            We spent too many evenings trying to get a Ferroamp talk to a Sungrow, a Sungrow talk to an Easee,
-            and <em>none of them</em> talking to a sane optimiser. Every vendor has a cloud. Every cloud has a
-            latency floor. The grid balances every <em>second</em> — a 2-second round trip to
-            someone's data centre in Frankfurt is not a control loop. It's a rumor.
-          </p>
-          <p>
-            So we wrote 42W. A single binary you can <code>scp</code> to a Raspberry Pi. Drivers in plain Lua
-            so anyone who can read a register map can add an inverter in an afternoon. Physics at the edge,
-            priceshaving at the planner, and the cloud is a nice-to-have — not a dependency.
-          </p>
-          <p>
-            It works. Real homes are running it through real winters. <strong>28 Lua drivers</strong> now,
-            three planner modes, a setup wizard, a Home Assistant add-on, push notifications, and a remote-access
-            bridge so we can help debug your install without a VPN.
-          </p>
-          <p>
-            We <em>know</em> this stuff at <a href="https://sourceful.energy" style="color:var(--accent);text-decoration:none">Sourceful</a>.
-            Much of the design came from hard-won experience coordinating distributed energy for real customers.
-            42W is what happens when that experience meets a homeowner who wants it <em>on their terms</em>.
-          </p>
+      <!-- ============ WHAT IT IS / SOLVES ============ -->
+      <section id="what">
+        <p class="section-label">// what it is</p>
+        <h2>A real energy optimiser that lives in your house.</h2>
+        <p class="section-intro">
+          <strong>forty-two watts</strong> (42W) is an open-source, local-first <strong>home energy management
+          system</strong>. One small Go binary runs on a Raspberry Pi and turns your solar inverter, home battery,
+          grid meter and EV charger into one coordinated system — deciding every few seconds when to charge,
+          discharge, hold, import or export, so your house quietly runs on its own power and the cheapest electrons
+          on the spot market.
+        </p>
+
+        <div class="contrast">
+          <div class="contrast-col bad">
+            <p class="ct-label">The usual home setup</p>
+            <ul>
+              <li>Every vendor has its own app and its own cloud</li>
+              <li>Battery, solar and EV charger don't talk to each other</li>
+              <li>Control round-trips through a data centre — 2–5&nbsp;s of latency</li>
+              <li>"Optimisation" is a timer with a schedule</li>
+              <li>It stops working the day the cloud does</li>
+            </ul>
+          </div>
+          <div class="contrast-col good">
+            <p class="ct-label">With 42W</p>
+            <ul>
+              <li>One binary coordinates every device on your site</li>
+              <li>PV, load, battery and the car are planned together</li>
+              <li>A real control loop on the edge — decisions in milliseconds</li>
+              <li>A genuine 48-hour model-predictive optimiser, not a schedule</li>
+              <li>Runs fully offline; the cloud is opt-in, never required</li>
+            </ul>
+          </div>
         </div>
+
+        <p class="leadership">
+          We haven't found another open project that does all of this at once — a real model-predictive optimiser,
+          a millisecond edge control loop, V2X-aware dispatch and a hot-reloadable driver model — running locally
+          on a $50 computer under an MIT licence. <strong>If 42W isn't the state of the art in open home energy,
+          point us at what is.</strong>
+        </p>
       </section>
 
       <!-- ============ FEATURES ============ -->
@@ -345,23 +475,31 @@
           </div>
           <div class="cell">
             <h3>MPC planner <span class="k">15 min · 48 h</span></h3>
-            <p>Dynamic programming over 51 SoC levels × 21 actions × 193 slots. Solves in ~0.6 ms. Three strategies: self-consumption, cheap charging, full arbitrage. Reactive replan on forecast divergence &gt; 500 Wh.</p>
+            <p>Dynamic programming over 51 SoC levels × 21 actions × 193 slots. Solves in ~0.6 ms. Three strategies: self-consumption, passive arbitrage, full arbitrage. Reactive replan on forecast divergence &gt; 500 Wh.</p>
           </div>
           <div class="cell">
-            <h3>Digital twins <span class="k">60 s</span></h3>
-            <p>Three online models: a PV twin (RLS, learns your roof), a load twin (168 hour-of-week buckets + heating coefficient), and a price twin (fills the day-ahead gap). No training phase — they learn while they work.</p>
+            <h3>Self-learning forecasts <span class="k">PV · load · price</span></h3>
+            <p>Built-in PV and load forecasting that teaches itself — no setup, no training phase, no external service. A PV twin learns your roof, a load twin learns your household (down to how it heats), and a price twin fills the gap past the day-ahead. They get better every day they run.</p>
           </div>
           <div class="cell">
-            <h3>Lua drivers <span class="k">28 shipped</span></h3>
-            <p>Sungrow, Ferroamp (MQTT+Modbus), Huawei, Deye, Solis, SMA, Fronius, Kostal, GoodWe, Growatt, Sofar, SolarEdge (3 variants), Victron, Pixii, Sonnen, CTEK, Tesla Vehicle, Easee, SDM630, Sourceful Zap. One <code>.lua</code> per device. Hot-reloadable.</p>
+            <h3>Negative prices, handled</h3>
+            <p>When the spot price drops below zero, exporting <em>costs</em> you money. 42W knows — it stops dumping to the grid and soaks the cheap (or paid-for) energy into the battery or the car instead. A penalty becomes a free charge.</p>
+          </div>
+          <div class="cell">
+            <h3>Lua drivers <span class="k">vast majority</span></h3>
+            <p>Covers the vast majority of inverters, batteries and chargers people actually own — Sungrow, Ferroamp, Huawei, Deye, Solis, SMA, Fronius, Kostal, GoodWe, Growatt, Sofar, SolarEdge, Victron, Pixii, sonnen, Tibber, CTEK, Easee, Tesla — and we're constantly adding more. One <code>.lua</code> per device, hot-reloadable, no build step.</p>
+          </div>
+          <div class="cell">
+            <h3>Mix any vendors</h3>
+            <p>A Ferroamp meter, a Sungrow battery and an Easee charger — three different makers — run side by side as one coordinated system. Most platforms lock you to a single brand. 42W treats your house as the boundary, not the warranty.</p>
+          </div>
+          <div class="cell">
+            <h3>EV &amp; V2X aware</h3>
+            <p>When the car charges, home batteries stop discharging into it — no round-tripping through two battery systems. V2X chargers (Ferroamp DC2, Ambibox) emit bidirectional vehicle power without confusing stationary storage. Easee + OCPP 1.6J central system.</p>
           </div>
           <div class="cell">
             <h3>Watchdog</h3>
             <p>Any driver silent &gt; 60 s flips offline and receives <code>DefaultMode</code>. Each driver implements an autonomous fallback — Sungrow reverts to self-consumption, Ferroamp publishes <code>auto</code>. Safe 02:00 crashes.</p>
-          </div>
-          <div class="cell">
-            <h3>EV-aware dispatch</h3>
-            <p>When the car is charging, home batteries stop discharging into it. No round-tripping through two battery systems. Easee cloud driver + OCPP 1.6J central system on port 8887.</p>
           </div>
           <div class="cell">
             <h3>Home Assistant</h3>
@@ -372,24 +510,20 @@
             <p>SQLite hot store keeps 14 days at 5 s resolution. Daily rolloff to zstd-compressed Parquet, dictionary-encoded per metric. A full year fits in a few GB. Query your house.</p>
           </div>
           <div class="cell">
-            <h3>Remote access <span class="k">SubEtha</span></h3>
-            <p>Time-bound remote access over <em>SubEtha</em> — our own private relay at <code>subetha.fortytwowatts.com</code>, hop-by-hop, no vendor cloud, no port forwarding. Start a session from the web UI; an MCP bridge lets Claude help debug your install on the other side.</p>
+            <h3>Remote access <span class="k">passkeys · p2p</span></h3>
+            <p>Reach your house from anywhere at <code>home.fortytwowatts.com</code> — secured with passkeys (no passwords) over a peer-to-peer connection, so your data never sits in a vendor cloud. No port forwarding, no VPN. An <code>ftw-pair</code> MCP bridge can even let Claude help debug your install from the other side.</p>
           </div>
           <div class="cell">
             <h3>Push notifications <span class="k">ntfy</span></h3>
             <p>Subscribe to a topic on your phone, pick events to track (driver offline / recovery), set per-event thresholds and cooldowns. Provider registry; adding Pushover or Slack is one Go file.</p>
           </div>
           <div class="cell">
-            <h3>Mobile app <span class="k">soon</span></h3>
-            <p>The <a href="https://sourceful.energy" style="color:var(--accent);text-decoration:none">Sourceful Energy</a> mobile app is getting 42W support — pair your Pi over SubEtha, watch live flows, flip planner modes, get push alerts. iOS and Android. Coming soon.</p>
-          </div>
-          <div class="cell">
             <h3>Self-tuning batteries</h3>
             <p>The <code>selftune</code> package injects known step commands, observes the response, and fits ARX(1) parameters. Bootstraps the cascade controller from first principles. No calibration wizard required.</p>
           </div>
           <div class="cell">
-            <h3>Scenarios test matrix <span class="k">forecast × telemetry × mode</span></h3>
-            <p>Combinatorial replay of MPC inputs against control-loop outputs. Catches the bugs that only appear when the cloud is wrong, the meter is noisy, <em>and</em> the user picked the weird mode.</p>
+            <h3>Mobile app <span class="k">soon</span></h3>
+            <p>The <a href="https://sourceful.energy" style="color:var(--accent);text-decoration:none">Sourceful Energy</a> mobile app is getting 42W support — pair your Pi over a passkey-secured p2p link, watch live flows, flip planner modes, get push alerts. iOS and Android. Coming soon.</p>
           </div>
         </div>
       </section>
@@ -399,7 +533,7 @@
         <p class="section-label">// planner modes</p>
         <h2>Three modes. One brain.</h2>
         <p class="section-intro">
-          Same MPC, same DP, same clamps. What changes is the objective. Pick a mode in the UI; the planner re-solves at the next 15-minute boundary.
+          Same MPC, same self-learning forecasts, same clamps. What changes is the objective. Pick a mode in the UI; the planner re-solves at the next 15-minute boundary. Few open systems offer true <em>passive</em> arbitrage at all — that's where we're unique.
         </p>
         <div class="philo">
           <div class="card">
@@ -408,7 +542,7 @@
           </div>
           <div class="card">
             <h3><span class="num">PASSIVE</span>Passive arbitrage</h3>
-            <p>Charges <em>only</em> from your own surplus PV, then discharges when prices peak. Merges the old <code>planner_self</code> and <code>planner_cheap</code> intents — your roof pays back faster, the meter never spins backwards on purpose.</p>
+            <p>Never imports to charge — works your own PV surplus only. If exporting the surplus right now beats storing it, it exports now; if the evening peak pays more, it waits and discharges then. Your roof pays back faster, the meter never spins backwards on purpose, and few open systems do this at all.</p>
           </div>
           <div class="card">
             <h3><span class="num">ACTIVE</span>Active arbitrage</h3>
@@ -504,7 +638,7 @@
           <div class="spec-row"><span class="k">mpc.horizon</span><span class="v"><span class="accent">48</span> hours</span></div>
           <div class="spec-row"><span class="k">mpc.state_space</span><span class="v">51 · 21 · 193 ≈ <span class="accent">207k</span></span></div>
           <div class="spec-row"><span class="k">mpc.solve_time</span><span class="v">~<span class="accent">0.6</span> ms</span></div>
-          <div class="spec-row"><span class="k">drivers.shipped</span><span class="v"><span class="accent">28</span> lua files</span></div>
+          <div class="spec-row"><span class="k">drivers.coverage</span><span class="v">vast majority · growing</span></div>
           <div class="spec-row"><span class="k">planner.modes</span><span class="v">self · passive · active</span></div>
           <div class="spec-row"><span class="k">pi.integral_limit</span><span class="v">3000 W</span></div>
           <div class="spec-row"><span class="k">dispatch.slew_rate</span><span class="v">500 W / interval</span></div>
@@ -515,13 +649,62 @@
           <div class="spec-row"><span class="k">twin.load</span><span class="v">168 hour-of-week buckets · α=0.1</span></div>
           <div class="spec-row"><span class="k">history.hot</span><span class="v">14 days @ 5 s (SQLite)</span></div>
           <div class="spec-row"><span class="k">history.cold</span><span class="v">Parquet · zstd · dictionary encoded</span></div>
-          <div class="spec-row"><span class="k">codebase.go</span><span class="v">~<span class="accent">38,900</span> lines</span></div>
-          <div class="spec-row"><span class="k">codebase.tests</span><span class="v">~29,700 lines · 119 files</span></div>
           <div class="spec-row"><span class="k">snapshot.size</span><span class="v">~50 MB · ~2 s restore</span></div>
-          <div class="spec-row"><span class="k">remote.access</span><span class="v">ftw-pair · <span class="accent">SubEtha</span> relay</span></div>
+          <div class="spec-row"><span class="k">remote.access</span><span class="v">passkeys · <span class="accent">p2p</span></span></div>
           <div class="spec-row"><span class="k">notifications</span><span class="v">ntfy · template events</span></div>
           <div class="spec-row"><span class="k">license</span><span class="v">MIT</span></div>
         </div>
+      </section>
+
+      <!-- ============ STORY ============ -->
+      <section>
+        <p class="section-label">// origin</p>
+        <h2>Born from frustration.</h2>
+        <div class="story">
+          <p>
+            We spent too many evenings trying to get a Ferroamp to talk to a Sungrow, a Sungrow to talk to an Easee,
+            and <em>none of them</em> talking to a sane optimiser. Every vendor has a cloud. Every cloud has a
+            latency floor. The grid balances every <em>second</em> — a 2-second round trip to
+            someone's data centre in Frankfurt is not a control loop. It's a rumor.
+          </p>
+          <p>
+            So we wrote 42W. A single binary you can <code>scp</code> to a Raspberry Pi. Drivers in plain Lua
+            so anyone who can read a register map can add an inverter in an afternoon. Physics at the edge,
+            price-shaving at the planner, and the cloud is a nice-to-have — not a dependency.
+          </p>
+          <p>
+            It works. Real homes are running it through real winters. Dozens of Lua drivers, three planner modes,
+            EV and V2X awareness, a setup wizard, a Home Assistant add-on, push notifications, and a passkey-secured,
+            peer-to-peer remote-access bridge so we can help debug your install without a VPN.
+          </p>
+          <p>
+            We <em>know</em> this stuff at <a href="https://sourceful.energy" style="color:var(--accent);text-decoration:none">Sourceful</a>.
+            Much of the design came from hard-won experience coordinating distributed energy for real customers.
+            42W is what happens when that experience meets a homeowner who wants it <em>on their terms</em>.
+          </p>
+        </div>
+      </section>
+
+      <!-- ============ COMMUNITY / DISCORD ============ -->
+      <section id="community">
+        <p class="section-label">// join the build</p>
+        <h2>Built in the open. Come help.</h2>
+        <p class="section-intro">
+          42W gets better every week because people run it on hardware we've never seen and tell us what broke.
+          The Discord is where drivers get written, bugs get triaged, and your weird inverter finds its register
+          map. Whether you're flashing your first SD card or porting a new battery — <strong>that's where it
+          happens.</strong>
+        </p>
+        <div class="community-card">
+          <div class="community-text">
+            <h3>The 42W Discord</h3>
+            <p>Setup help, driver requests, planner tuning, and the occasional 02:00 victory screenshot. Real homes, real installs, real people. Pull up a towel.</p>
+          </div>
+          <a class="btn btn-discord btn-lg" href="https://discord.gg/z7FxpQnk">Join the Discord →</a>
+        </div>
+        <p class="community-fine">
+          Prefer GitHub? <a href="https://github.com/frahlg/forty-two-watts">Open an issue or send a driver PR</a> — both count just as much.
+        </p>
       </section>
 
       <!-- ============ AUTHORS ============ -->
@@ -579,7 +762,7 @@
             <p>Already running Home Assistant OS or Supervised? Install 42W as a supervisor add-on. Maintained by Erik at <code>erikarenhill/ha-addon-forty-two-watts</code>.</p>
           </div>
           <div class="cell">
-            <h3>From source <span class="k">Go 1.25+</span></h3>
+            <h3>From source <span class="k">Go 1.26+</span></h3>
             <p>Clone, <code>make dev</code> for sim, <code>make build-arm64</code> + <code>scp</code> for a Pi. For people who want to add a driver or hack the planner.</p>
           </div>
         </div>
@@ -600,6 +783,11 @@
 
     <footer>
       <div>So long, and thanks for all the kWh.</div>
+      <div class="links">
+        <a class="dc" href="https://discord.gg/z7FxpQnk">Discord</a>
+        <a href="https://github.com/frahlg/forty-two-watts">GitHub</a>
+        <a href="https://sourceful.energy">Sourceful</a>
+      </div>
       <div class="fine">
         <a href="https://github.com/frahlg/forty-two-watts">github.com/frahlg/forty-two-watts</a> · MIT
       </div>
