@@ -117,6 +117,12 @@ h1 em { color: var(--signal); font-style: normal; }
 .start-links a:hover { background: rgba(245, 242, 225, 0.05); }
 .start-links span { color: var(--signal); font-family: "JetBrains Mono", monospace; font-size: 9px; }
 .start-links b { align-self: end; color: rgba(245, 242, 225, 0.48); font-family: "JetBrains Mono", monospace; font-size: 9px; font-weight: 400; text-transform: uppercase; }
+.ha-addon { grid-column: 1 / -1; display: grid; grid-template-columns: 1.4fr 0.6fr; align-items: center; gap: 24px 48px; padding: 26px; border: 1px solid var(--line-dark); border-top: none; background: #111; }
+.ha-addon h3 { margin: 0 0 10px; color: var(--cream); font-size: 20px; font-weight: 500; letter-spacing: -0.02em; }
+.ha-addon p { margin: 0; color: rgba(245, 242, 225, 0.66); max-width: 52ch; }
+.ha-addon .section-kicker { margin-bottom: 14px; }
+.ha-addon-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 18px 28px; }
+.ha-addon .text-link { color: var(--cream); font-weight: 500; text-decoration-color: var(--signal); text-underline-offset: 5px; white-space: nowrap; }
 
 .section { padding: 104px 0; border-bottom: 1px solid var(--line); }
 .section-head { display: grid; grid-template-columns: repeat(12, 1fr); gap: 24px; margin-bottom: 64px; }
@@ -272,6 +278,7 @@ footer { padding: 62px 0 26px; background: var(--ink); color: var(--cream); }
   .install-command { padding: 18px; }
   .start-links { grid-template-columns: 1fr; }
   .start-links a { min-height: 108px; }
+  .ha-addon { grid-template-columns: 1fr; }
   .section { padding: 76px 0; }
   .section-head { margin-bottom: 42px; }
   h2 { font-size: clamp(2.8rem, 14vw, 4.4rem); }
